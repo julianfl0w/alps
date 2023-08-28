@@ -10,6 +10,23 @@
 #						- MRtrix3 (https://www.mrtrix.org/download/)
 # This script assumes that FSL and MRtrix3 are in your $PATH.
 
+# Run the installer if necessary
+# Check if /data/fsl directory does not exist
+if [[ ! -d "/data/fsl" ]]; then
+    echo "/data/fsl directory does not exist. Running fslinstaller.py..."
+    python /data/fslinstaller.py
+else
+    echo "/opt/fsl directory already exists."
+fi
+
+# copy it to opt
+echo "Copying fsl to opt (note: add to docker build)"
+cp -r /data/fsl /opt
+
+# update and install bc
+echo "Updating and installing bc (basic calc)"
+apt update
+apt install -y bc
 
 # initial directories and parameters
 #script_folder="${ALPSDIR}"
