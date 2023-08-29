@@ -17,8 +17,15 @@ If you have any question, please contact me: barisano at stanford.edu.
 - [Examples of usage](#examples-of-usage)
 
 ## Required libraries
-- FSL v. 6.0.3 or newer (https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation) (it should work with older versions of FSL, but you might need to get the b02b0_1.cnf configuration file from newer FSL versions. This configuration file is needed in case your dwi input has odd number of slices. Older versions of FSL will also give you LESS consistent results, i.e., if you launch the script 100 times with the same inputs, you will have 100 slightly different ALPS results, with a variability in the order of about 0.001).
+- FSL v. 6.0.3 or newer (included) (https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation) (it should work with older versions of FSL, but you might need to get the b02b0_1.cnf configuration file from newer FSL versions. This configuration file is needed in case your dwi input has odd number of slices. Older versions of FSL will also give you LESS consistent results, i.e., if you launch the script 100 times with the same inputs, you will have 100 slightly different ALPS results, with a variability in the order of about 0.001).
 - MRtrix3 (https://www.mrtrix.org/download) (only needed for preprocessing steps)
+
+## FSL Usage and License
+
+This project uses tools and/or data from the FMRIB Software Library (FSL). FSL is proprietary software with a license that allows for free use for non-commercial entities. Please refer to the full FSL license terms, which can be found [here](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence) or in the `FSL_LICENSE.txt` file in this repository.
+
+If you plan to use this project for commercial purposes, please ensure you have the appropriate permissions from the FMRIB Analysis Group or the University of Oxford.
+
 
 This script assumes that FSL and MRtrix3 are in your $PATH.
 
