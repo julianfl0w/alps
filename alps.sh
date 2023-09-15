@@ -10,23 +10,7 @@
 #						- MRtrix3 (https://www.mrtrix.org/download/)
 # This script assumes that FSL and MRtrix3 are in your $PATH.
 
-# Run the installer if necessary
-# Check if /data/fsl directory does not exist
-if [[ ! -d "/data/fsl" ]]; then
-    echo "/data/fsl directory does not exist. Running fslinstaller.py..."
-    python /data/fslinstaller.py
-else
-    echo "/opt/fsl directory already exists."
-fi
 
-# copy it to opt
-echo "Copying fsl to opt (note: add to docker build)"
-cp -r /data/fsl /opt
-
-# update and install bc
-echo "Updating and installing bc (basic calc)"
-apt update
-apt install -y bc
 
 # initial directories and parameters
 #script_folder="${ALPSDIR}"
@@ -405,19 +389,8 @@ if [ $skip -eq 0 ]; then
 				n_vol=${dimtmp[1]}
 				indx=""
 				for ((i=1; i<=$n_vol; i+=1)); do indx="$indx 1"; done
-				echo $indx > index.txt
-				if [ $eddy == "1" ] && [ -f ${FSLDIR}/bin/eddy_openmp ]; then 
-					echo "Found eddy_openmp! Running ${FSLDIR}/bin/eddy_openmp with default options"
-					eddy_openmp --imain="$dwi1_processed" --mask=b0_brain_mask --acqp=acqparams.txt --index=index.txt --bvecs=bvec1 --bvals=bval1 --topup=my_topup_results --out=eddy_corrected_data
-				elif [ $eddy == "2" ] && [ -f ${FSLDIR}/bin/eddy ]; then 
-					echo "Running ${FSLDIR}/bin/eddy with default options";
-					eddy --imain="$dwi1_processed" --mask=b0_brain_mask --acqp=acqparams.txt --index=index.txt --bvecs=bvec1 --bvals=bval1 --topup=my_topup_results --out=eddy_corrected_data
-				elif [ $eddy == "3" ] && [ -f ${FSLDIR}/bin/eddy_correct ]; then 
-					echo "Running ${FSLDIR}/bin/eddy_correct with default options";
-					eddy_correct "$dwi1_processed" eddy_corrected_data 0 trilinear
-				else echo "Eddy with user-specified eddy program ${FSLDIR}/bin/$eddy"
-					"${FSLDIR}/bin/$eddy" --imain="$dwi1_processed" --mask=b0_brain_mask --acqp=acqparams.txt --index=index.txt --bvecs=bvec1 --bvals=bval1 --topup=my_topup_results --out=eddy_corrected_data
-				fi
+
+				./runEddy.sh
 			elif [ "${PEdir1}" != "${PEdir2}-" ] || [ "${PEdir2}" != "${PEdir1}-" ] || [ "${b0_dwi1}" != "${b0_dwi2}" ]; then
 				fslroi "$dwi1_processed" "${outdir}/b0" 0 1
 				bet2 "${outdir}/b0" "${outdir}/b0_brain" -m
@@ -428,19 +401,7 @@ if [ $skip -eq 0 ]; then
 				n_vol=${dimtmp[1]}
 				indx=""
 				for ((i=1; i<=$n_vol; i+=1)); do indx="$indx 1"; done
-				echo $indx > index.txt
-				if [ $eddy == "1" ] && [ -f ${FSLDIR}/bin/eddy_openmp ]; then 
-						echo "Found eddy_openmp! Running ${FSLDIR}/bin/eddy_openmp with default options"
-						eddy_openmp --imain="$dwi1_processed" --mask=b0_brain_mask --acqp=acqparams.txt --index=index.txt --bvecs=bvec1 --bvals=bval1 --out=eddy_corrected_data
-				elif [ $eddy == "2" ] && [ -f ${FSLDIR}/bin/eddy ]; then 
-						echo "Running ${FSLDIR}/bin/eddy with default options";
-						eddy --imain="$dwi1_processed" --mask=b0_brain_mask --acqp=acqparams.txt --index=index.txt --bvecs=bvec1 --bvals=bval1 --out=eddy_corrected_data
-				elif [ $eddy == "3" ] && [ -f ${FSLDIR}/bin/eddy_correct ]; then 
-						echo "Running ${FSLDIR}/bin/eddy_correct with default options";
-						eddy_correct "$dwi1_processed" eddy_corrected_data 0 trilinear
-				else echo "Eddy with user-specified eddy program ${FSLDIR}/bin/$eddy"
-					"${FSLDIR}/bin/$eddy" --imain="$dwi1_processed" --mask=b0_brain_mask --acqp=acqparams.txt --index=index.txt --bvecs=bvec1 --bvals=bval1 --out=eddy_corrected_data
-				fi
+				./runEddy.sh
 			fi
 		elif [ ! "$dwi2" ]; then
 			fslroi "$dwi1_processed" "${outdir}/b0" 0 1
@@ -452,19 +413,7 @@ if [ $skip -eq 0 ]; then
 			n_vol=${dimtmp[1]}
 			indx=""
 			for ((i=1; i<=$n_vol; i+=1)); do indx="$indx 1"; done
-			echo $indx > index.txt
-			if [ $eddy == "1" ] && [ -f ${FSLDIR}/bin/eddy_openmp ]; then 
-					echo "Found eddy_openmp! Running ${FSLDIR}/bin/eddy_openmp with default options"
-					eddy_openmp --imain="$dwi1_processed" --mask=b0_brain_mask --acqp=acqparams.txt --index=index.txt --bvecs=bvec1 --bvals=bval1 --out=eddy_corrected_data
-			elif [ $eddy == "2" ] && [ -f ${FSLDIR}/bin/eddy ]; then 
-					echo "Running ${FSLDIR}/bin/eddy with default options";
-					eddy --imain="$dwi1_processed" --mask=b0_brain_mask --acqp=acqparams.txt --index=index.txt --bvecs=bvec1 --bvals=bval1 --out=eddy_corrected_data
-			elif [ $eddy == "3" ] && [ -f ${FSLDIR}/bin/eddy_correct ]; then 
-					echo "Running ${FSLDIR}/bin/eddy_correct with default options";
-					eddy_correct "$dwi1_processed" eddy_corrected_data 0 trilinear
-			else echo "Eddy with user-specified eddy program ${FSLDIR}/bin/$eddy"
-				"${FSLDIR}/bin/$eddy" --imain="$dwi1_processed" --mask=b0_brain_mask --acqp=acqparams.txt --index=index.txt --bvecs=bvec1 --bvals=bval1 --out=eddy_corrected_data
-			fi
+			bash -x /data/runEddy.sh
 		fi
 	elif [ ! -f "${json1}" ] && [ $eddy == "3" ]; then
 		echo "Running ${FSLDIR}/bin/eddy_correct with default options";
